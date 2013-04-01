@@ -1,3 +1,11 @@
-assets/
-protected/runtime/
-themes/classic/views/
+/composer.lock
+/protected/config/common-local.php
+/protected/config/console-local.php
+/protected/config/main-local.php
+
+/assets/*
+/protected/runtime/*
+/vendor/*
+
+!/assets/.gitkeep
+!/protected/runtime/.gitkeep
