@@ -106,30 +106,34 @@ class Intelius
      */
     private function processSearchResults($response)
     {
-        if (!preg_match_all('/<div class="identity">.*?<a.*?href="(.*?)".*?>(.*?)<\/a>/s', $response, $matches)) {
+        if (!preg_match_all('/<div class="identity">.*?<a.*?href="(.*?)".*?>(.*?)<\/a>.*?<p>.*?Age: <strong>(.*?)<\/strong>/s', $response, $matches)) {
             return array();
         }
         $data = array();
         for ($i = 0; $i < count($matches[0]); $i++) {
             $name = $this->processName($matches[2][$i]);
             $data[] = array(
+                'profileUrl' => $matches[1][$i],
                 'firstName' => $name['firstName'],
                 'lastName' => $name['lastName'],
-                'profileUrl' => $matches[1][$i],
+                'age' => $matches[3][$i],
             );
-        }
-        foreach ($data as &$dataItem) {
-            $this->processProfile($dataItem);
         }
         return $data;
     }
 
-    /**
-     * @param array $data
-     */
-    private function processProfile(&$data)
+    public function processProfile($profileUrl)
     {
-        $response = $this->webRequest->get($data['profileUrl']);
+        $this->login();
+        $data = array(
+            'profileUrl' => $profileUrl,
+        );
+        $response = $this->webRequest->get($profileUrl);
+        if (preg_match('/<span class="name">(.*?)<\/span>/', $response, $match)) {
+            $name = $this->processName(preg_replace('/\s+/', ' ', $match[1]));
+            $data['firstName'] = $name['firstName'];
+            $data['lastName'] = $name['lastName'];
+        }
         if (preg_match('/<p>Age: <strong>(.*?)<\/strong><\/p>/', $response, $match)) {
             $data['age'] = $match[1];
         }
@@ -175,6 +179,7 @@ class Intelius
                 );
             }
         }
+        return $data;
     }
 
     /**
