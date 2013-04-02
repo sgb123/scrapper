@@ -159,12 +159,12 @@ class Intelius
             $addressResponse = $match[1];
             if (preg_match_all('/<li.*?><a.*?href="(.*?)".*?>(.*?)<br\/>(.*?)<br\/>(.*?)<img/s', $addressResponse, $matches)) {
                 for ($i = 0; $i < count($matches[0]); $i++) {
-                    $data['addresses'][] = array(
+                    $data['addresses'][] = CMap::mergeArray(array(
                         'addressUrl' => $matches[1][$i],
                         'line1' => strip_tags($matches[2][$i]),
                         'line2' => $matches[3][$i],
                         'phone' => $this->processPhone($matches[4][$i]),
-                    );
+                    ), $this->processAddressInfo($matches[1][$i]));
                 }
             }
         }
@@ -178,6 +178,86 @@ class Intelius
                     'profileUrl' => $matches[1][$i],
                 );
             }
+        }
+        return $data;
+    }
+
+    private function processAddressInfo($addressUrl)
+    {
+        $data = array();
+        $response = $this->webRequest->get($addressUrl, true);
+        if (preg_match('/<strong>Owner Information<\/strong>.*?<table.*?>.*?' . str_repeat('<td>(.*?)<\/td>.*?<\/tr>.*?', 4) . '<\/table>/s',
+            $response, $match)
+        ) {
+            $fullName = trim($match[1]);
+            if (strpos($fullName, '<br/>') !== false) {
+                $fullName = preg_replace('/\s+/', ' ', $fullName);
+                $fullName = implode(';', explode(' <br/> ', $fullName));
+            }
+            $data['owner'] = array(
+                'fullName' => $fullName,
+                'estMarketValue' => $this->processNumber($match[2]),
+                'taxAmount' => $this->processNumber($match[3]),
+                'taxYear' => $match[4],
+            );
+        }
+        if (preg_match('/<strong>Property Details<\/strong>.*?<table.*?>.*?' . str_repeat('<td>(.*?)<\/td>.*?<\/tr>.*?', 6) . '<\/table>/s',
+            $response, $match)
+        ) {
+            $data['details'] = array(
+                'acres' => $match[1],
+                'bedrooms' => $match[2],
+                'bathrooms' => $match[3],
+                'builtYear' => $match[4],
+                'landArea' => $this->processNumber($match[5]),
+                'livingArea' => $this->processNumber($match[6]),
+            );
+        }
+        if (preg_match('/<strong>Neighbors<\/strong>.*?<table.*?>(.*?)<\/table>/s', $response, $match)) {
+            $neighborResponse = $match[1];
+            if (preg_match_all('/<td class="c1">(.*?)<\/td>/s', $neighborResponse, $matches)) {
+                for ($i = 0; $i < count($matches[0]); $i++) {
+                    $data['neighbors'][] = $matches[1][$i];
+                }
+            }
+        }
+        if (preg_match('/<strong>Local Census Data<\/strong>.*?' . str_repeat('<td>(.*?)<\/td>.*?<\/tr>.*?', 3) . '/s',
+            $response, $match)
+        ) {
+            if (preg_match('/^([0-9]{1,2}%) \/ ([0-9]{1,2}%)$/', $match[3], $sexMatch)) {
+                $data['censusData'] = array(
+                    'households' => $this->processNumber($match[1]),
+                    'families' => $this->processPercent($match[2]),
+                    'male' => $this->processPercent($sexMatch[1]),
+                    'female' => $this->processPercent($sexMatch[2]),
+                );
+            }
+        }
+        if (preg_match('/<strong>Education<\/strong>.*?' . str_repeat('<td>(.*?)<\/td>.*?<\/tr>.*?', 3) . '/s',
+            $response, $match)
+        ) {
+            $data['education'] = array(
+                'highSchool' => $this->processPercent($match[1]),
+                'college' => $this->processPercent($match[2]),
+                'graduate' => $this->processPercent($match[3]),
+            );
+        }
+        if (preg_match('/<strong>Income<\/strong>.*?' . str_repeat('<td>(.*?)<\/td>.*?<\/tr>.*?', 11) . '/s',
+            $response, $match)
+        ) {
+            $data['income'] = array(
+                'average' => $this->processNumber($match[1]),
+                'less_10' => $this->processPercent($match[2]),
+                'slice_10_15' => $this->processPercent($match[3]),
+                'slice_15_25' => $this->processPercent($match[4]),
+                'slice_25_35' => $this->processPercent($match[5]),
+                'slice_35_50' => $this->processPercent($match[6]),
+                'slice_50_75' => $this->processPercent($match[7]),
+                'slice_75_100' => $this->processPercent($match[8]),
+                'slice_100_150' => $this->processPercent($match[9]),
+                'slice_150_200' => $this->processPercent($match[10]),
+                'more_200' => $this->processPercent($match[11]),
+            );
         }
         return $data;
     }
@@ -216,5 +296,19 @@ class Intelius
             'prefix' => $match[2],
             'exchange' => $match[3],
         );
+    }
+
+    /**
+     * @param string $number
+     * @return string
+     */
+    private function processNumber($number)
+    {
+        return preg_replace('/\D+/', '', $number);
+    }
+
+    private function processPercent($number)
+    {
+        return $this->processNumber($number) / 100;
     }
 }
