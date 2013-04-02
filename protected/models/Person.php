@@ -6,6 +6,7 @@
  * @property string $last_name
  * @property integer $age
  * @property Address[] $addresses
+ * @property Email[] $emails
  */
 class Person extends CActiveRecord
 {
@@ -46,6 +47,7 @@ class Person extends CActiveRecord
     {
         return array(
             'addresses' => array(self::HAS_MANY, 'Address', 'person_id'),
+            'emails' => array(self::HAS_MANY, 'Email', 'person_id'),
         );
     }
 
