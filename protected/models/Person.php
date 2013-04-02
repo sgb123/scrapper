@@ -159,6 +159,69 @@ class Person extends CActiveRecord
                     $phoneModel->save();
                 }
                 PersonAddress::getOrAdd($this->id, $addressModel->id);
+                if (!empty($address['owner'])) {
+                    $addressOwnerModel = new AddressOwner();
+                    $addressOwnerModel->full_name = $address['owner']['fullName'];
+                    $addressOwnerModel->est_market_value = $address['owner']['estMarketValue'];
+                    $addressOwnerModel->tax_amount = $address['owner']['taxAmount'];
+                    $addressOwnerModel->tax_year = $address['owner']['taxYear'];
+                    $addressOwnerModel->save();
+                    $addressModel->address_owner_id = $addressOwnerModel->id;
+                }
+                if (!empty($address['details'])) {
+                    $addressDetailsModel = new AddressDetails();
+                    $addressDetailsModel->acres = $address['details']['acres'];
+                    $addressDetailsModel->bedrooms = $address['details']['bedrooms'];
+                    $addressDetailsModel->bathrooms = $address['details']['bathrooms'];
+                    $addressDetailsModel->built_year = $address['details']['builtYear'];
+                    $addressDetailsModel->land_area = $address['details']['landArea'];
+                    $addressDetailsModel->land_area = $address['details']['livingArea'];
+                    $addressDetailsModel->save();
+                    $addressModel->address_details_id = $addressDetailsModel->id;
+                }
+                if (!empty($address['neighbors'])) {
+                    foreach ($address['neighbors'] as $neighbor) {
+                        // @todo Many to many (?)
+                        $neighborModel = new AddressNeighbor();
+                        $neighborModel->full_name = $neighbor;
+                        $neighborModel->address_id = $addressModel->id;
+                        $neighborModel->save();
+                    }
+                }
+                if (!empty($address['censusData'])) {
+                    $addressCensusData = new AddressCensusData();
+                    $addressCensusData->households = $address['censusData']['households'];
+                    $addressCensusData->families = $address['censusData']['families'];
+                    $addressCensusData->male = $address['censusData']['male'];
+                    $addressCensusData->female = $address['censusData']['female'];
+                    $addressCensusData->save();
+                    $addressModel->address_census_data_id = $addressCensusData->id;
+                }
+                if (!empty($address['education'])) {
+                    $addressEducationModel = new AddressEducation();
+                    $addressEducationModel->high_school = $address['education']['highSchool'];
+                    $addressEducationModel->college = $address['education']['college'];
+                    $addressEducationModel->graduate = $address['education']['graduate'];
+                    $addressEducationModel->save();
+                    $addressModel->address_education_id = $addressEducationModel->id;
+                }
+                if (!empty($address['income'])) {
+                    $addressIncomeModel = new AddressIncome();
+                    $addressIncomeModel->average = $address['income']['average'];
+                    $addressIncomeModel->less_10 = $address['income']['less_10'];
+                    $addressIncomeModel->slice_10_15 = $address['income']['slice_10_15'];
+                    $addressIncomeModel->slice_15_25 = $address['income']['slice_15_25'];
+                    $addressIncomeModel->slice_25_35 = $address['income']['slice_25_35'];
+                    $addressIncomeModel->slice_35_50 = $address['income']['slice_35_50'];
+                    $addressIncomeModel->slice_50_75 = $address['income']['slice_50_75'];
+                    $addressIncomeModel->slice_75_100 = $address['income']['slice_75_100'];
+                    $addressIncomeModel->slice_100_150 = $address['income']['slice_100_150'];
+                    $addressIncomeModel->slice_150_200 = $address['income']['slice_150_200'];
+                    $addressIncomeModel->more_200 = $address['income']['more_200'];
+                    $addressIncomeModel->save();
+                    $addressModel->address_income_id = $addressIncomeModel->id;
+                }
+                $addressModel->save();
             }
         }
         if (!empty($data['relatives'])) {
@@ -167,7 +230,6 @@ class Person extends CActiveRecord
             }
         }
         $this->processed = new CDbExpression('current_timestamp');
-        // @todo Process other attributes
         $this->save();
     }
 }
