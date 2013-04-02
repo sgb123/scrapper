@@ -25,7 +25,7 @@ $this->widget('bootstrap.widgets.TbNavbar', array(
             'items' => array(
                 array('label' => Yii::t('app', 'Home'), 'url' => array('/site/index')),
                 array('label' => Yii::t('app', 'Person search'), 'url' => array('/person/index'),
-                    'visible' => !Yii::app()->user->isGuest),
+                    'active' => $this->id == 'person', 'visible' => !Yii::app()->user->isGuest),
                 array('label' => Yii::t('app', 'Login'), 'url' => array('/site/login'),
                     'visible' => Yii::app()->user->isGuest),
                 array('label' => Yii::t('app', 'Logout'), 'url' => array('/site/logout'),

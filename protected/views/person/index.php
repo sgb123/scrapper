@@ -15,7 +15,7 @@ $this->breadcrumbs = array(
 /** @var $form TbActiveForm */
 $form = $this->beginWidget('bootstrap.widgets.TbActiveForm');
 ?>
-    <label><?php echo Yii::t('app', 'Personal info'); ?></label>
+    <label><?php echo Yii::t('app', 'General info'); ?></label>
     <div class="controls controls-row">
         <?php
         echo $form->textField($personSearchForm, 'firstName', array(

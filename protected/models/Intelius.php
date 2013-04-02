@@ -161,8 +161,8 @@ class Intelius
                 for ($i = 0; $i < count($matches[0]); $i++) {
                     $data['addresses'][] = array(
                         'addressUrl' => $matches[1][$i],
-                        'lineOne' => strip_tags($matches[2][$i]),
-                        'lineTwo' => $matches[3][$i],
+                        'line1' => strip_tags($matches[2][$i]),
+                        'line2' => $matches[3][$i],
                         'phone' => $this->processPhone($matches[4][$i]),
                     );
                 }
@@ -212,11 +212,9 @@ class Intelius
             return null;
         }
         return array(
-            array(
-                'areaCode' => $match[1],
-                'prefix' => $match[2],
-                'exchange' => $match[3],
-            )
+            'areaCode' => $match[1],
+            'prefix' => $match[2],
+            'exchange' => $match[3],
         );
     }
 }

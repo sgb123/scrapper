@@ -33,4 +33,23 @@ class PersonController extends Controller
             'personSearchForm' => $personSearchForm,
         ));
     }
+
+    /**
+     * @param int $id
+     * @throws CHttpException
+     */
+    public function actionView($id)
+    {
+        /** @var $model Person */
+        $model = Person::model()->findByPk($id);
+        if (!$model) {
+            throw new CHttpException(404);
+        }
+        if (!$model->processed || strtotime($model->processed) < time() - Yii::app()->params['inteliusUpdatePeriod']) {
+            $model->process();
+        }
+        $this->render('view', array(
+            'model' => $model,
+        ));
+    }
 }

@@ -16,5 +16,6 @@ return CMap::mergeArray(array(
     'params' => array(
         'inteliusUsername' => '',
         'inteliusPassword' => '',
+        'inteliusUpdatePeriod' => 60 * 60 * 24,
     ),
 ), $cfgLocal);

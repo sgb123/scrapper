@@ -1,10 +1,11 @@
 <?php
 /**
  * @property integer $id
- * @property integer $areaCode
+ * @property integer $area_code
  * @property integer $prefix
  * @property integer $exchange
- * @property Address[] $addresses
+ * @property integer $address_id
+ * @property Address $address
  */
 class Phone extends CActiveRecord
 {
@@ -15,6 +16,30 @@ class Phone extends CActiveRecord
     public static function model($className = __CLASS__)
     {
         return parent::model($className);
+    }
+
+    /**
+     * @param int $areaCode
+     * @param int $prefix
+     * @param int $exchange
+     * @return Phone
+     */
+    public static function getOrAdd($areaCode, $prefix, $exchange)
+    {
+        $model = self::model()->findByAttributes(array(
+            'area_code' => $areaCode,
+            'prefix' => $prefix,
+            'exchange' => $exchange,
+        ));
+        if ($model) {
+            return $model;
+        }
+        $model = new self();
+        $model->area_code = $areaCode;
+        $model->prefix = $prefix;
+        $model->exchange = $exchange;
+        $model->save();
+        return $model;
     }
 
     /**
@@ -31,9 +56,9 @@ class Phone extends CActiveRecord
     public function rules()
     {
         return array(
-            array('areaCode, prefix, exchange', 'required'),
-            array('areaCode, prefix, exchange', 'numerical', 'integerOnly' => true),
-            array('id, areaCode, prefix, exchange', 'safe', 'on' => 'search'),
+            array('area_code, prefix, exchange', 'required'),
+            array('area_code, prefix, exchange, address_id', 'numerical', 'integerOnly' => true),
+            array('id, area_code, prefix, exchange, address_id', 'safe', 'on' => 'search'),
         );
     }
 
@@ -43,7 +68,7 @@ class Phone extends CActiveRecord
     public function relations()
     {
         return array(
-            'addresses' => array(self::HAS_MANY, 'Address', 'phone_id'),
+            'address' => array(self::BELONGS_TO, 'Address', 'address_id'),
         );
     }
 
@@ -54,9 +79,10 @@ class Phone extends CActiveRecord
     {
         return array(
             'id' => Yii::t('app', 'ID'),
-            'areaCode' => Yii::t('app', 'Area code'),
+            'area_code' => Yii::t('app', 'Area code'),
             'prefix' => Yii::t('app', 'Prefix'),
             'exchange' => Yii::t('app', 'Exchange'),
+            'address_id' => Yii::t('app', 'Address'),
         );
     }
 
@@ -67,9 +93,10 @@ class Phone extends CActiveRecord
     {
         $criteria = new CDbCriteria;
         $criteria->compare('id', $this->id);
-        $criteria->compare('areaCode', $this->areaCode);
+        $criteria->compare('area_code', $this->area_code);
         $criteria->compare('prefix', $this->prefix);
         $criteria->compare('exchange', $this->exchange);
+        $criteria->compare('address_id', $this->address_id);
         return new CActiveDataProvider($this, array(
             'criteria' => $criteria,
         ));

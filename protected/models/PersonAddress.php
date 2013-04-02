@@ -1,34 +1,37 @@
 <?php
 /**
  * @property integer $id
- * @property string $email
  * @property integer $person_id
- * @property PersonEmail[] $personRelations
- * @property Person[] $persons
+ * @property integer $address_id
+ * @property Address $address
+ * @property Person $person
  */
-class Email extends CActiveRecord
+class PersonAddress extends CActiveRecord
 {
     /**
-     * @param string $email
-     * @return CActiveRecord|Email
+     * @param int $personId
+     * @param int $addressId
+     * @return CActiveRecord|PersonAddress
      */
-    public static function getOrAdd($email)
+    public static function getOrAdd($personId, $addressId)
     {
         $model = self::model()->findByAttributes(array(
-            'email' => $email,
+            'person_id' => $personId,
+            'address_id' => $addressId,
         ));
         if ($model) {
             return $model;
         }
         $model = new self();
-        $model->email = $email;
+        $model->person_id = $personId;
+        $model->address_id = $addressId;
         $model->save();
         return $model;
     }
 
     /**
      * @param string $className
-     * @return Email
+     * @return PersonAddress
      */
     public static function model($className = __CLASS__)
     {
@@ -40,7 +43,7 @@ class Email extends CActiveRecord
      */
     public function tableName()
     {
-        return 'email';
+        return 'person_address';
     }
 
     /**
@@ -49,9 +52,9 @@ class Email extends CActiveRecord
     public function rules()
     {
         return array(
-            array('email', 'required'),
-            array('email', 'length', 'max' => 255),
-            array('id, email', 'safe', 'on' => 'search'),
+            array('person_id, address_id', 'required'),
+            array('person_id, address_id', 'numerical', 'integerOnly' => true),
+            array('id, person_id, address_id', 'safe', 'on' => 'search'),
         );
     }
 
@@ -61,8 +64,8 @@ class Email extends CActiveRecord
     public function relations()
     {
         return array(
-            'personRelations' => array(self::HAS_MANY, 'PersonEmail', 'email_id'),
-            'persons' => array(self::MANY_MANY, 'Person', 'person_email(email_id, person_id)'),
+            'address' => array(self::BELONGS_TO, 'Address', 'address_id'),
+            'person' => array(self::BELONGS_TO, 'Person', 'person_id'),
         );
     }
 
@@ -73,7 +76,8 @@ class Email extends CActiveRecord
     {
         return array(
             'id' => Yii::t('app', 'ID'),
-            'email' => Yii::t('app', 'Email'),
+            'person_id' => Yii::t('app', 'Person'),
+            'address_id' => Yii::t('app', 'Address'),
         );
     }
 
@@ -84,7 +88,8 @@ class Email extends CActiveRecord
     {
         $criteria = new CDbCriteria;
         $criteria->compare('id', $this->id);
-        $criteria->compare('email', $this->email, true);
+        $criteria->compare('person_id', $this->person_id);
+        $criteria->compare('address_id', $this->address_id);
         return new CActiveDataProvider($this, array(
             'criteria' => $criteria,
         ));
