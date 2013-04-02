@@ -36,7 +36,12 @@ $this->widget('bootstrap.widgets.TbNavbar', array(
 ));
 ?>
 <div class="container">
-    <?php echo $content; ?>
+    <?php
+    $this->widget('bootstrap.widgets.TbBreadcrumbs', array(
+        'links' => $this->breadcrumbs,
+    ));
+    echo $content;
+    ?>
 </div>
 </body>
 </html>
