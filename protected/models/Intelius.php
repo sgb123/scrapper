@@ -188,7 +188,12 @@ class Intelius
      */
     private function processName($name)
     {
-        if (!preg_match('/(\S+) (\S+)/', $name, $match)) {
+        if (substr_count($name, ' ') == 1) {
+            $pattern = '/(\S+) (\S+)/';
+        } else {
+            $pattern = '/(\S+) \S+ (\S+)/';
+        }
+        if (!preg_match($pattern, $name, $match)) {
             return null;
         }
         return array(

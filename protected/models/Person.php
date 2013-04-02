@@ -5,6 +5,7 @@
  * @property string $first_name
  * @property string $last_name
  * @property integer $age
+ * @property string $processed
  * @property Address[] $addresses
  * @property Email[] $emails
  */
@@ -17,6 +18,35 @@ class Person extends CActiveRecord
     public static function model($className = __CLASS__)
     {
         return parent::model($className);
+    }
+
+    /**
+     * @param array $data
+     * @return Person
+     * @throws CException
+     */
+    public static function processInteliusData($data)
+    {
+        if (!isset($data['profileUrl']) || !isset($data['firstName']) || !isset($data['lastName']) ||
+            !isset($data['age'])
+        ) {
+            throw new CException();
+        }
+        $model = self::model()->findByAttributes(array(
+            'first_name' => $data['firstName'],
+            'last_name' => $data['lastName'],
+            'age' => $data['age'],
+        ));
+        if ($model) {
+            return $model;
+        }
+        $model = new self();
+        $model->profile_url = $data['profileUrl'];
+        $model->first_name = $data['firstName'];
+        $model->last_name = $data['lastName'];
+        $model->age = $data['age'];
+        $model->save();
+        return $model;
     }
 
     /**
@@ -35,8 +65,9 @@ class Person extends CActiveRecord
         return array(
             array('profile_url, first_name, last_name', 'required'),
             array('age', 'numerical', 'integerOnly' => true),
-            array('profile_url, first_name, last_name', 'length', 'max' => 255),
-            array('id, profile_url, first_name, last_name, age', 'safe', 'on' => 'search'),
+            array('first_name, last_name', 'length', 'max' => 255),
+            array('processed', 'safe'),
+            array('id, profile_url, first_name, last_name, age, processed', 'safe', 'on' => 'search'),
         );
     }
 
@@ -62,6 +93,7 @@ class Person extends CActiveRecord
             'first_name' => Yii::t('app', 'First name'),
             'last_name' => Yii::t('app', 'Last name'),
             'age' => Yii::t('app', 'Age'),
+            'processed' => Yii::t('app', 'Processed'),
         );
     }
 
@@ -76,8 +108,14 @@ class Person extends CActiveRecord
         $criteria->compare('first_name', $this->first_name, true);
         $criteria->compare('last_name', $this->last_name, true);
         $criteria->compare('age', $this->age);
+        $criteria->compare('processed', $this->processed, true);
         return new CActiveDataProvider($this, array(
             'criteria' => $criteria,
         ));
+    }
+
+    public function process()
+    {
+        // @todo Person::process()
     }
 }
