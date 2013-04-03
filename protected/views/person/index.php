@@ -2,7 +2,7 @@
 /**
  * @var $this PersonController
  * @var PersonSearchForm $personSearchForm
- * @var CActiveDataProvider $dataProvider
+ * @var CSqlDataProvider $dataProvider
  */
 
 $this->pageTitle = Yii::t('app', 'Person search');
@@ -67,11 +67,21 @@ echo $form->textFieldRow($personSearchForm, 'email', array(
 <?php
 $this->widget('bootstrap.widgets.TbGridView', array(
     'columns' => array(
-        'first_name',
-        'last_name',
-        'age',
+        array(
+            'header' => Yii::t('app', 'First name'),
+            'name' => 'first_name',
+        ),
+        array(
+            'header' => Yii::t('app', 'Last name'),
+            'name' => 'last_name',
+        ),
+        array(
+            'header' => Yii::t('app', 'Age'),
+            'name' => 'age',
+        ),
         array(
             'class' => 'CButtonColumn',
+            'viewButtonUrl' => 'Yii::app()->createUrl("/person/view", array("id" => $data["id"]))',
             'template' => '{view}',
         ),
     ),
