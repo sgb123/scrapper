@@ -15,7 +15,7 @@
  * @property AddressDetails $addressDetails
  * @property AddressOwner $addressOwner
  * @property AddressNeighbor[] $addressNeighbors
- * @property PersonAddress[] $personAddresses
+ * @property PersonAddress[] $personRelations
  * @property Address[] $persons
  * @property Phone[] $phones
  */
@@ -87,7 +87,7 @@ class Address extends CActiveRecord
             'addressDetails' => array(self::BELONGS_TO, 'AddressDetails', 'address_details_id'),
             'addressOwner' => array(self::BELONGS_TO, 'AddressOwner', 'address_owner_id'),
             'addressNeighbors' => array(self::HAS_MANY, 'AddressNeighbor', 'address_id'),
-            'personAddresses' => array(self::HAS_MANY, 'PersonAddress', 'address_id'),
+            'personRelations' => array(self::HAS_MANY, 'PersonAddress', 'address_id'),
             'persons' => array(self::MANY_MANY, 'Person', 'person_address(address_id, person_id)'),
             'phones' => array(self::HAS_MANY, 'Phone', 'address_id'),
         );

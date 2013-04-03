@@ -8,7 +8,7 @@ class PersonController extends Controller
     {
         return CMap::mergeArray(array(
             array('allow',
-                'actions' => array('index', 'view',),
+                'actions' => array('index', 'view', 'viewAddress'),
                 'users' => array('@'),
             ),
         ), parent::accessRules());
@@ -41,7 +41,11 @@ class PersonController extends Controller
     public function actionView($id)
     {
         /** @var $model Person */
-        $model = Person::model()->findByPk($id);
+        $model = Person::model()->with(array(
+            'addresses',
+            'emails',
+            'childPersons',
+        ))->findByPk($id);
         if (!$model) {
             throw new CHttpException(404);
         }
@@ -49,6 +53,28 @@ class PersonController extends Controller
             $model->process();
         }
         $this->render('view', array(
+            'model' => $model,
+        ));
+    }
+
+    /**
+     * @param integer $id
+     * @throws CHttpException
+     */
+    public function actionViewAddress($id)
+    {
+        $model = Address::model()->with(array(
+            'addressCensusData',
+            'addressDetails',
+            'addressEducation',
+            'addressIncome',
+            'addressNeighbors',
+            'addressOwner',
+        ))->findByPk($id);
+        if (!$model) {
+            throw new CHttpException(404);
+        }
+        $this->renderPartial('_viewAddress', array(
             'model' => $model,
         ));
     }

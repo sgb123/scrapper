@@ -6,6 +6,7 @@
  * @property integer $exchange
  * @property integer $address_id
  * @property Address $address
+ * @property string $full
  */
 class Phone extends CActiveRecord
 {
@@ -84,6 +85,11 @@ class Phone extends CActiveRecord
             'exchange' => Yii::t('app', 'Exchange'),
             'address_id' => Yii::t('app', 'Address'),
         );
+    }
+
+    public function getFull()
+    {
+        return '(' . $this->area_code . ') ' . $this->prefix . '-' . $this->exchange;
     }
 
     /**

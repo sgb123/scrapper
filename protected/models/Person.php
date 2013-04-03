@@ -90,7 +90,7 @@ class Person extends CActiveRecord
     {
         return array(
             'addressRelations' => array(self::HAS_MANY, 'PersonAddress', 'person_id'),
-            'addresses' => array(self::MANY_MANY, 'PersonAddress', 'person_address(person_id, address_id)'),
+            'addresses' => array(self::MANY_MANY, 'Address', 'person_address(person_id, address_id)'),
             'emailRelations' => array(self::HAS_MANY, 'PersonEmail', 'person_id'),
             'emails' => array(self::MANY_MANY, 'Email', 'person_email(person_id, email_id)'),
             'parentPersonRelations' => array(self::HAS_MANY, 'PersonPerson', 'child_person_id'),

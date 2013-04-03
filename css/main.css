@@ -1,0 +1,7 @@
+.address {
+    cursor: pointer;
+}
+
+.address-selected {
+    font-weight: bold;
+}

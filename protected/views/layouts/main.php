@@ -3,6 +3,10 @@
  * @var $this Controller
  * @var $content string
  */
+
+/** @var $clientScript CClientScript */
+$clientScript = Yii::app()->clientScript;
+$clientScript->registerCssFile(Yii::app()->baseUrl . '/css/main.css');
 ?>
 <!DOCTYPE html>
 <html lang="en">
