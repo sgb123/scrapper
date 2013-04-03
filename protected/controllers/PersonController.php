@@ -24,9 +24,7 @@ class PersonController extends Controller
             $personSearchForm->unsetAttributes();
         }
         $request = Yii::app()->request;
-        if ($request->isPostRequest) {
-            $personSearchForm->attributes = $request->getPost('PersonSearchForm');
-        }
+        $personSearchForm->attributes = $request->getQuery('PersonSearchForm');
         $dataProvider = $personSearchForm->search();
         $this->render('index', array(
             'dataProvider' => $dataProvider,

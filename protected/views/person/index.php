@@ -13,7 +13,10 @@ $this->breadcrumbs = array(
     <h1><?php echo $this->pageTitle; ?></h1>
 <?php
 /** @var $form TbActiveForm */
-$form = $this->beginWidget('bootstrap.widgets.TbActiveForm');
+$form = $this->beginWidget('bootstrap.widgets.TbActiveForm', array(
+    'action' => $this->createUrl('/person/index'),
+    'method' => 'get',
+));
 ?>
     <label><?php echo Yii::t('app', 'General info'); ?></label>
     <div class="controls controls-row">
