@@ -151,6 +151,21 @@ CREATE TABLE IF NOT EXISTS `person_person` (
   ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
 
+CREATE TABLE IF NOT EXISTS `person_search_form_history` (
+  `id`              INT(11)   NOT NULL AUTO_INCREMENT,
+  `first_name`      VARCHAR(255) DEFAULT NULL,
+  `last_name`       VARCHAR(255) DEFAULT NULL,
+  `city_state`      VARCHAR(255) DEFAULT NULL,
+  `phone_area_code` INT(11) DEFAULT NULL,
+  `phone_prefix`    INT(11) DEFAULT NULL,
+  `phone_exchange`  INT(11) DEFAULT NULL,
+  `email`           VARCHAR(255) DEFAULT NULL,
+  `updated`         TIMESTAMP NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+)
+  ENGINE = InnoDB
+  DEFAULT CHARSET = utf8;
+
 CREATE TABLE IF NOT EXISTS `phone` (
   `id`         INT(11) NOT NULL AUTO_INCREMENT,
   `area_code`  INT(11) NOT NULL,
